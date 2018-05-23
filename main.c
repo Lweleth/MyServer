@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
 	int stat = 0;
 	if(argc < 1 || (stat = config_parse(argc, argv, &server_config)) != 0)
 	{
-		printf("%d\n",stat);
+		//printf("%d\n",stat);
 		usage(argv[0]);
 		exit(1);
 	}
@@ -71,22 +71,22 @@ work:;
 			// printf("ffd = %d \n", ffd);
 			if( fd == listen_fd)
 			{
-				printf("~~~accept con~~~\n");
+				//printf("~~~accept con~~~\n");
 				server_accept(fd);
-				printf("~~~accept cpl~~~\n");
+				//printf("~~~accept cpl~~~\n");
 			}
 			else 
 			{
-				printf("~~~recv!~~~\n");
+				//printf("~~~recv!~~~\n");
 				connection_t* con = server_events[i].data.ptr;
-				printf("in:%d\n", (con)->event.events & EPOLLIN);
+				//printf("in:%d\n", (con)->event.events & EPOLLIN);
 				int stat;
 				if(con->active_time + server_config.timeout < time(0))
 					continue;
 				if(((con)->event.events & EPOLLIN))
 				{
 					stat = request_handle(con);
-					printf("stat: %d\n", stat);
+					//printf("stat: %d\n", stat);
 					if(stat == ERROR)
 					{
 						con->active_time = 0;
@@ -106,7 +106,7 @@ work:;
 								break;
 						}
 					}
-					printf("~~~recv finished!~~~\n");
+					//printf("~~~recv finished!~~~\n");
 				}
 				/*if(stat == -1)
 				{
@@ -114,14 +114,14 @@ work:;
 					connection_open_out(epoll_fd, con);
 				}
 				*/				
-				printf("out:%d\n", (con)->event.events & EPOLLOUT);
+				//printf("out:%d\n", (con)->event.events & EPOLLOUT);
 				if(((con)->event.events & EPOLLOUT))
 				{
 					stat = response_handle(con);
 					//char ss[]="404040401212131";
 					//stat = send(con->fd, ss, sizeof(ss), 0);
-					printf("~~~send~~~\n");fflush(stdout);
-					printf("stat: %d\n", stat);
+					//printf("~~~send~~~\n");fflush(stdout);
+					//printf("stat: %d\n", stat);
 					if(stat == ERROR)
 					{
 						con->active_time = 0;
@@ -141,14 +141,14 @@ work:;
 								break;
 						}
 					}
-					printf("~~~send finished~~~\n");fflush(stdout);
+					//printf("~~~send finished~~~\n");fflush(stdout);
 					//PIPE 
 					// con->event.events &= (~EPOLLOUT);
 					// epoll_ctl(epoll_fd, EPOLL_CTL_MOD, con->fd, &con->event);
 				}
-				printf("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@2\n");
+				//printf("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@2\n");
 				//string_print(&con->req_info.parser.url.extension_MIME);
-				printf("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@2\n");
+				//printf("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@2\n");
 			}
 		}
 		connection_check();

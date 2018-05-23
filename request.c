@@ -156,14 +156,14 @@ int request_check_resource(request_t* req)
 		ref_path++;
 	}
 	// //
-	printf("绝对%d-[", (req->parser).url.abs_path.len);
-	string_print(&(req->parser).url.abs_path);
-	printf("]结束\n");
-	printf("相对%d-[", (req->parser).url.ref_path.len);
-	//string_print(&(req->parser).url.ref_path);
-	printf("%s\n", ref_path);
-	printf("]结束\n");
-	// //
+	// printf("绝对%d-[", (req->parser).url.abs_path.len);
+	// string_print(&(req->parser).url.abs_path);
+	// printf("]结束\n");
+	// printf("相对%d-[", (req->parser).url.ref_path.len);
+	// //string_print(&(req->parser).url.ref_path);
+	// printf("%s\n", ref_path);
+	// printf("]结束\n");
+	// // //
 	// 	printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
 	// 	for(int i = 0; i < (req->parser).url.abs_path.len; i++)
 	// 		printf("%c", (req->parser).url.abs_path.data[i]);
@@ -185,16 +185,16 @@ int request_check_resource(request_t* req)
     
 		return ERROR;
 	}
-	printf("~~!!!!!!!!!!!!!!!!!!!!!fddddddddddddddddd%d~~\n", fd);
-	string_print(&(req->parser).url.extension_MIME);
-	printf("~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!~~\n");
+	// printf("~~!!!!!!!!!!!!!!!!!!!!!fddddddddddddddddd%d~~\n", fd);
+	// string_print(&(req->parser).url.extension_MIME);
+	// printf("~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!~~\n");
 	//if file is dir, default make "index.html" as fd.
 	struct stat filestat;
 	fstat(fd, &filestat);
 	if(S_ISDIR(filestat.st_mode))
 	{
 		int homefd = openat(fd, "index.html", O_RDONLY);
-		printf("%d\n", homefd);
+		// printf("%d\n", homefd);
 		if(homefd == -1)
 		{
 			ERR_ON(true , "404");
@@ -219,25 +219,25 @@ int request_check_resource(request_t* req)
 int request_handle_request_line(request_t *req)// first 
 {
 	//parse request line
-	printf("2$$$$$\n");fflush(stdout);
+	// printf("2$$$$$\n");fflush(stdout);
 	int stat = parse_request_line(req->req_buf, &req->parser);
-		printf("*********************************************\n%s %d\n", __FUNCTION__, __LINE__);
-	// string_print(&con->req_info.parser.url_str);
- 	printf("[%s] %lu\n*********************************************\n", req->parser.next_pos, req->req_buf->len);
+	// 	printf("*********************************************\n%s %d\n", __FUNCTION__, __LINE__);
+	// // string_print(&con->req_info.parser.url_str);
+ // 	printf("[%s] %lu\n*********************************************\n", req->parser.next_pos, req->req_buf->len);
 	if(stat == AGAIN)
 	{
-		printf("@\n");
+		// printf("@\n");
 		return AGAIN;
 	}
 	else if(stat == ERROR)
 	{
-		// ERR_ON(stat == ERROR, "400 parse request line faild");
+		ERR_ON(stat == ERROR, "400 parse request line faild");
 		// return OK;
 
 		assert(0);
 		return response_build_error(req, 400);
 	}
-	printf("3$$$$$\n");fflush(stdout);
+	// printf("3$$$$$\n");fflush(stdout);
 	//check version
 	if(request_check_http_version(req) == ERROR)
 		response_build_error(req, 505);
@@ -253,7 +253,7 @@ int request_handle_headers_field(request_t *req)// then
 	int flag = 0;
 	int stat;
 	header_fun *headfun;
-	printf("4$$$$$\n");fflush(stdout);
+	// printf("4$$$$$\n");fflush(stdout);
 	while(true)
 	{
 		if(flag == 1)
@@ -284,14 +284,14 @@ int request_handle_headers_field(request_t *req)// then
 		}
 	}
 	req->req_handler = request_handle_body;
-	printf("5$$$$$\n");fflush(stdout);
+	// printf("5$$$$$\n");fflush(stdout);
 	return OK;
 }
 
 int request_handle_body(request_t *req)//final
 {
 	int stat;
-	printf("6$$$$$\n");fflush(stdout);
+	// printf("6$$$$$\n");fflush(stdout);
 	switch(req->parser.transfer_encoding)
 	{
 		case TE_IDENTITY:
@@ -303,8 +303,8 @@ int request_handle_body(request_t *req)//final
 			stat = ERROR;
 			break;
 	}
-	printf("7$$$$$\n");fflush(stdout);
-	printf("body stat:%d\n", stat);
+	// printf("7$$$$$\n");fflush(stdout);
+	// printf("body stat:%d\n", stat);
 	switch(stat)
 	{
 		case AGAIN:
@@ -323,7 +323,7 @@ int request_handle_body(request_t *req)//final
 			return response_build_error(req, 501);
 
 	}
-	printf("8$$$$$\n");fflush(stdout);
+	// printf("8$$$$$\n");fflush(stdout);
 	assert(0);
 	return OK;
 }
@@ -390,11 +390,15 @@ int request_handle_connection(request_t *req, size_t offset)
 {
 	request_handle_general(req, offset);
 	string_t str = req->parser.req_headers.connection;
-	if(string_equal(&str, &SSTRING("keep-alive")))
+	if(string_ncase_equal(&str, &SSTRING("keep-alive")))
 		req->parser.keep_alive = true;
-	else if(string_equal(&str, &SSTRING("close")))
+	else if(string_ncase_equal(&str, &SSTRING("close")))
 		req->parser.keep_alive = false;
 	else {// error connction:"val"
+		printf("[");
+
+		string_print(&str);
+	printf("]\n");
 		ERR_ON(true, "400 error header connection opt val");
 		//assert(0);
 		// return OK; 
@@ -421,34 +425,34 @@ int request_handle_transfer_encoding(request_t *req, size_t offset)
 {
 	request_handle_general(req, offset);
 	string_t str = req->parser.req_headers.transfer_encoding;
-	if (string_equal(&str, &SSTRING("chunked")))// not support
+	if (string_ncase_equal(&str, &SSTRING("chunked")))// not support
 	{
 		req->parser.transfer_encoding = TE_CHUNKED;
 		return response_build_error(req, 501);
 	}
-	else if (string_equal(&str, &SSTRING("compress"))) 
+	else if (string_ncase_equal(&str, &SSTRING("compress"))) 
 	{
 		req->parser.transfer_encoding = TE_COMPRESS;
 		return response_build_error(req, 501);
 	} 
-	else if (string_equal(&str, &SSTRING("deflate"))) 
+	else if (string_ncase_equal(&str, &SSTRING("deflate"))) 
 	{
 		req->parser.transfer_encoding = TE_DEFLATE;
 		return response_build_error(req, 501);
    	} 
-    else if (string_equal(&str, &SSTRING("gzip"))) 
+    else if (string_ncase_equal(&str, &SSTRING("gzip"))) 
     {
 		req->parser.transfer_encoding = TE_GZIP;
 		return response_build_error(req, 501);
 
     }
-    else if (string_equal(&str, &SSTRING("identity"))) 
+    else if (string_ncase_equal(&str, &SSTRING("identity"))) 
     {
     	req->parser.transfer_encoding = TE_IDENTITY;
     	return response_build_error(req, 501);
     }
 	else{
-		printf("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n");
+		// printf("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n");
 		return response_build_error(req, 400);
 	} 
 	return OK;

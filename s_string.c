@@ -47,6 +47,25 @@ int string_cmp(const string_t *str1, const string_t *str2)
 		return 0;
 	return  len1 > len2 ? 1 : -1;
 }
+
+int string_ncase_equal(const string_t *str,  const string_t* ss)
+{
+	if(str->len != ss->len)
+		return 0;
+	int len = str->len;
+	for(int i = 0; i < len; i++)
+	{
+		if(str->data[i] != ss->data[i])
+		{
+			if((str->data[i] >= 'A' && str->data[i] <= 'Z' && (ss->data[i] - 'a' + 'A') == str->data[i])
+			|| (str->data[i] >= 'a' && str->data[i] <= 'z' && (ss->data[i] - 'A' + 'a') == str->data[i]))
+				continue;
+			else 
+				return 0;
+		}
+	}
+	return 1;
+}
 /*
 int main()
 {

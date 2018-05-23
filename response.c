@@ -184,7 +184,7 @@ void response_build_crlf(struct request_info *r)
 
 int response_build(request_t *req)//build response
 {
-    printf("9$$$$$\n");fflush(stdout);
+    // printf("9$$$$$\n");fflush(stdout);
     response_build_status_line(req);
     response_build_date(req);
     response_build_server(req);
@@ -192,7 +192,7 @@ int response_build(request_t *req)//build response
     response_build_content_length(req);
     response_build_connection(req);
     response_build_crlf(req);
-    printf("10$$$$$\n");fflush(stdout);
+    // printf("10$$$$$\n");fflush(stdout);
     //assert(0);
     return OK;
 }
