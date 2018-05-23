@@ -1,0 +1,7 @@
+{
+	"root" : "NULL",
+	"port" : 8000,     //65535
+	"timeout": 30,
+	"worker":  4,    //core of work
+	"debug":  true,
+}
